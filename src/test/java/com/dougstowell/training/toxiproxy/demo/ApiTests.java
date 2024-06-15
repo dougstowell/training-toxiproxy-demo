@@ -31,6 +31,12 @@ class ApiTests {
   }
 
   @Test
+  void given_the_api_is_available_then_it_should_get_the_file() {
+    when().get("/api/v1/demo/file").then().statusCode(200)
+        .body(containsString("items in the file"));
+  }
+
+  @Test
   void given_we_create_a_new_cache_entry_then_it_should_report_ok() {
     when().post("/api/v1/demo/cache").then().statusCode(200)
         .body(containsString("Cache entry created"));

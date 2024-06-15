@@ -32,9 +32,11 @@ class ApiResilienceTests {
   @Test
   @SneakyThrows
   void given_the_cache_is_unavailable_then_it_should_report_an_error() {
+    // Arrange a connection close.
     toxiProxyHelper.getRedisProxy().toxics().timeout("sql-timeout", ToxicDirection.DOWNSTREAM,
         15000);
 
+    // Act - call the API and assert that the error was handled.
     when().get("/api/v1/demo/cache").then().statusCode(200)
         .body(containsString("Error, could not get the cache"));
   }
@@ -42,9 +44,11 @@ class ApiResilienceTests {
   @Test
   @SneakyThrows
   void given_the_file_is_unavailable_then_it_should_report_an_error() {
-    toxiProxyHelper.getLocalstackProxy().toxics().timeout("s3-response-timeout",
-        ToxicDirection.UPSTREAM, 15000);
+    // Arrange a connection close.
+    toxiProxyHelper.getLocalstackProxy().toxics().resetPeer("s3-reset-peer",
+        ToxicDirection.DOWNSTREAM, 1);
 
+    // Act - call the API and assert that the error was handled.
     when().post("/api/v1/demo/file").then().statusCode(200)
         .body(containsString("Error, could not create a file"));
   }

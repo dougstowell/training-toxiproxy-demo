@@ -7,21 +7,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.client.config.ClientOverrideConfiguration;
 
-/**
- * Configuration class designed to create custom Spring Boot beans to use the AWS library.
- */
 @Configuration
 @AllArgsConstructor
 public class AwsBeanProvider {
+    private final AwsConfiguration config;
+
     @Bean
     public S3AsyncClient getAwsS3Client() {
         var cfg = ClientOverrideConfiguration.builder().apiCallTimeout(Duration.ofSeconds(10))
                 .build();
+        var cred = AwsBasicCredentials.builder().accessKeyId(config.getAccessKeyId())
+                .secretAccessKey(config.getSecretAccessKey()).build();
 
-        return S3AsyncClient.builder().region(Region.EU_WEST_2).forcePathStyle(true)
-                .overrideConfiguration(cfg).endpointOverride(URI.create("http://localhost:4566"))
-                .build();
+        return S3AsyncClient.builder().credentialsProvider(StaticCredentialsProvider.create(cred))
+                .region(Region.EU_WEST_2).forcePathStyle(true).overrideConfiguration(cfg)
+                .endpointOverride(URI.create(config.getEndpointOverride())).build();
     }
 }
