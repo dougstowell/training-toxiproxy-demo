@@ -5,13 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 @Configuration
 public class RedisBeanProvider {
+    private final RedisConfiguration config;
+
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration =
-                new RedisStandaloneConfiguration("localhost", 6379);
+                new RedisStandaloneConfiguration(config.getHost(), config.getPort());
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 

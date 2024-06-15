@@ -46,7 +46,7 @@ class ApiResilienceTests {
   void given_the_file_is_unavailable_then_it_should_report_an_error() {
     // Arrange a connection close.
     toxiProxyHelper.getLocalstackProxy().toxics().resetPeer("s3-reset-peer",
-        ToxicDirection.DOWNSTREAM, 1);
+        ToxicDirection.UPSTREAM, 1);
 
     // Act - call the API and assert that the error was handled.
     when().post("/api/v1/demo/file").then().statusCode(200)
