@@ -1,0 +1,49 @@
+version: "3.8"
+
+networks:
+  toxiproxy-demo-local:
+
+services:
+  toxiproxy-demo-toxiproxy:
+    container_name: toxiproxy-demo-toxiproxy
+    image: "ghcr.io/shopify/toxiproxy"
+    command:
+      - -host=0.0.0.0
+      - -proxy-metrics
+      - -config=toxiproxy.json
+    volumes:
+      - ./auto/toxiproxy.json:/toxiproxy.json
+    ports:
+      - 8474:8474 # Toxiproxy API
+      - 4566:4566 # Localstack
+      - 6379:6379 # Redis
+    networks:
+      - toxiproxy-demo-local
+
+  toxiproxy-demo-redis:
+    container_name: toxiproxy-demo-redis
+    image: redis:7.0-alpine
+    depends_on:
+      - toxiproxy-demo-toxiproxy
+    ports:
+      - 6380:6379
+    command: redis-server --save 20 1 --loglevel warning
+    networks:
+      - toxiproxy-demo-local
+
+  toxiproxy-demo-localstack:
+    container_name: toxiproxy-demo-localstack
+    image: localstack/localstack
+    depends_on:
+      - toxiproxy-demo-toxiproxy
+    ports:
+      - 4567:4566
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - SERVICES=s3
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - toxiproxy-demo-local

@@ -1,0 +1,16 @@
+[
+    {
+      "name": "toxiproxy-demo_test_localstack_master",
+      "listen": "[::]:4566",
+      "upstream": "toxiproxy-demo-localstack:4566",
+      "enabled": true,
+      "toxics": []
+    },
+    {
+        "name": "toxiproxy-demo_test_redis_master",
+        "listen": "[::]:6379",
+        "upstream": "toxiproxy-demo-redis:6379",
+        "enabled": true,
+        "toxics": []
+      }
+  ]
